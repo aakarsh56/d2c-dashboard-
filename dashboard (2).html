@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Northbound — Channel & Product Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#FAF8F3; --ink:#16211B; --ink-soft:#4B564F;
+    --line:#DDD8CC; --teal:#1F6E5C; --teal-soft:#E4EEE9;
+    --amber:#B8722E; --card:#FFFFFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#12160F; --ink:#F2F0E8; --ink-soft:#B7BDB1;
+      --line:#33392E; --teal:#5FBFA4; --teal-soft:#1B2A22;
+      --amber:#E0A25C; --card:#191E16;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12160F; --ink:#F2F0E8; --ink-soft:#B7BDB1;
+    --line:#33392E; --teal:#5FBFA4; --teal-soft:#1B2A22;
+    --amber:#E0A25C; --card:#191E16;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .serif{font-family:'Newsreader',Georgia,serif;}
+  .metric-num{font-variant-numeric:tabular-nums;}
+  table{border-collapse:collapse;}
+  ::-webkit-scrollbar{height:8px;width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="max-w-6xl mx-auto px-6 md:px-8 py-10">
+
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-8 border-b" style="border-color:var(--line)">
+    <div>
+      <p class="text-sm tracking-wide" style="color:var(--teal)">Northbound Supply Co.</p>
+      <h1 class="serif text-3xl md:text-4xl mt-1" style="color:var(--ink)">Channel &amp; product performance</h1>
+      <p class="text-sm mt-2" style="color:var(--ink-soft)">Trailing 30 days, all storefronts and paid channels</p>
+    </div>
+    <div class="text-sm" style="color:var(--ink-soft)">
+      Sep 24 – Oct 23, 2026 · updated hourly
+    </div>
+  </header>
+
+  <!-- Metrics -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-px mt-8" style="background:var(--line)">
+    <div class="p-6" style="background:var(--card)">
+      <p class="text-sm" style="color:var(--ink-soft)">Top category</p>
+      <p class="serif text-3xl mt-2 metric-num">Skincare</p>
+      <p class="text-sm mt-1" style="color:var(--teal)">38% of total revenue</p>
+    </div>
+    <div class="p-6" style="background:var(--card)">
+      <p class="text-sm" style="color:var(--ink-soft)">Total revenue</p>
+      <p class="serif text-3xl mt-2 metric-num">$486,200</p>
+      <p class="text-sm mt-1" style="color:var(--teal)">+12.4% vs. prior 30 days</p>
+    </div>
+    <div class="p-6" style="background:var(--card)">
+      <p class="text-sm" style="color:var(--ink-soft)">Highest discount channel</p>
+      <p class="serif text-3xl mt-2 metric-num">Influencer</p>
+      <p class="text-sm mt-1" style="color:var(--amber)">Avg. 27% off order value</p>
+    </div>
+  </section>
+
+  <!-- Chart + channel table -->
+  <section class="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-6">
+
+    <div class="lg:col-span-3 p-6" style="background:var(--card); border:1px solid var(--line)">
+      <div class="flex items-baseline justify-between">
+        <h2 class="serif text-xl">Revenue by category</h2>
+        <span class="text-sm" style="color:var(--ink-soft)">$, last 30 days</span>
+      </div>
+      <div class="mt-4" style="height:320px">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 p-6" style="background:var(--card); border:1px solid var(--line)">
+      <h2 class="serif text-xl">Channel discount rates</h2>
+      <p class="text-sm mt-1" style="color:var(--ink-soft)">Average % off, by acquisition channel</p>
+      <table class="w-full mt-4 text-sm">
+        <thead>
+          <tr class="text-left" style="color:var(--ink-soft)">
+            <th class="py-2 font-medium border-b" style="border-color:var(--line)">Channel</th>
+            <th class="py-2 font-medium border-b text-right" style="border-color:var(--line)">Revenue</th>
+            <th class="py-2 font-medium border-b text-right" style="border-color:var(--line)">Avg. discount</th>
+          </tr>
+        </thead>
+        <tbody id="channelTable"></tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <footer class="mt-10 pt-6 border-t text-sm" style="border-color:var(--line); color:var(--ink-soft)">
+    Figures are illustrative sample data for demonstration purposes.
+  </footer>
+
+</div>
+
+<script>
+  const categories = [
+    { name: 'Skincare',    revenue: 184760 },
+    { name: 'Apparel',     revenue: 121550 },
+    { name: 'Accessories', revenue: 76900  },
+    { name: 'Home',        revenue: 58400  },
+    { name: 'Wellness',    revenue: 44590  }
+  ];
+
+  const channels = [
+    { name: 'Influencer',  revenue: 96200,  discount: 27 },
+    { name: 'Email',       revenue: 88750,  discount: 9  },
+    { name: 'Instagram',   revenue: 142300, discount: 18 },
+    { name: 'Google Ads',  revenue: 110600, discount: 12 },
+    { name: 'Direct',      revenue: 48350,  discount: 4  }
+  ];
+
+  const tbody = document.getElementById('channelTable');
+  const maxDiscount = Math.max(...channels.map(c => c.discount));
+  channels
+    .slice()
+    .sort((a, b) => b.discount - a.discount)
+    .forEach(c => {
+      const tr = document.createElement('tr');
+      const isMax = c.discount === maxDiscount;
+      tr.innerHTML = `
+        <td class="py-2 border-b" style="border-color:var(--line)">${c.name}</td>
+        <td class="py-2 border-b text-right metric-num" style="border-color:var(--line)">$${c.revenue.toLocaleString()}</td>
+        <td class="py-2 border-b text-right metric-num" style="border-color:var(--line); color:${isMax ? 'var(--amber)' : 'var(--ink)'}; font-weight:${isMax ? 600 : 400}">${c.discount}%</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches &&
+                 document.documentElement.getAttribute('data-theme') !== 'light';
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  const textColor = isDark ? '#B7BDB1' : '#4B564F';
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+      labels: categories.map(c => c.name),
+      datasets: [{
+        data: categories.map(c => c.revenue),
+        backgroundColor: '#1F6E5C',
+        borderRadius: 2,
+        maxBarThickness: 46
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString() } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: textColor, font: { family: 'Inter' } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => '$' + v.toLocaleString() } }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
